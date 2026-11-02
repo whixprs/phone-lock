@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Phone Lock</string>
+    <string name="service_label">Phone Lock guard</string>
+    <string name="service_description">Detects when a protected app is opened so Phone Lock can ask for your fingerprint, and covers selected apps with black in the recent apps screen. Phone Lock does not collect, store or send any screen content.</string>
+    <string name="tab_lock">App Lock</string>
+    <string name="tab_recents">Hide in Recents</string>
+    <string name="search_hint">Search apps</string>
+    <string name="service_off_title">Guard service is off</string>
+    <string name="service_off_body">Phone Lock needs its accessibility service to detect when apps open and to black out recents. Tap Enable, then turn on \"Phone Lock guard\".\n\nIf the switch is greyed out (Android 13+): open Settings > Apps > Phone Lock, tap the ⋮ menu and choose \"Allow restricted settings\", then try again.</string>
+    <string name="service_on_title">Guard service is running</string>
+    <string name="service_on_body">Locks and recents masking are active.</string>
+    <string name="enable">Enable</string>
+    <string name="lock_hint">Apps switched on here ask for your fingerprint every time they are opened.</string>
+    <string name="recents_hint">Apps switched on here are covered with black on the recent apps screen instead of showing their last screen.</string>
+    <string name="unlock_title">Unlock %1$s</string>
+    <string name="unlock_subtitle">Use your fingerprint to continue</string>
+    <string name="unlock_settings_title">Unlock Phone Lock</string>
+    <string name="cancel">Cancel</string>
+    <string name="retry">Try again</string>
+    <string name="no_biometrics">No fingerprint is enrolled on this device. Add one in Settings > Security to use app locks.</string>
+</resources>

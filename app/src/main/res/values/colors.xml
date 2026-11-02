@@ -1,0 +1,5 @@
+<resources>
+    <color name="brand">#3D5AFE</color>
+    <color name="black">#FF000000</color>
+    <color name="masked_text">#FF5A5A5A</color>
+</resources>
