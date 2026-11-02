@@ -8,6 +8,23 @@ object Prefs {
     private const val FILE = "phone_lock"
     const val KEY_LOCKED = "locked_apps"
     const val KEY_HIDDEN = "hidden_recents_apps"
+    const val KEY_RELOCK_MODE = "relock_mode"
+    const val KEY_RELOCK_MINUTES = "relock_minutes"
+
+    /** When an unlocked app locks again. */
+    enum class RelockMode { BACKGROUND, TIMEOUT, SCREEN_OFF }
+
+    fun relockMode(ctx: Context): RelockMode =
+        runCatching { RelockMode.valueOf(prefs(ctx).getString(KEY_RELOCK_MODE, null)!!) }
+            .getOrDefault(RelockMode.BACKGROUND)
+
+    fun setRelockMode(ctx: Context, mode: RelockMode) =
+        prefs(ctx).edit().putString(KEY_RELOCK_MODE, mode.name).apply()
+
+    fun relockMinutes(ctx: Context): Int = prefs(ctx).getInt(KEY_RELOCK_MINUTES, 5)
+
+    fun setRelockMinutes(ctx: Context, minutes: Int) =
+        prefs(ctx).edit().putInt(KEY_RELOCK_MINUTES, minutes).apply()
 
     fun prefs(ctx: Context): SharedPreferences =
         ctx.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)

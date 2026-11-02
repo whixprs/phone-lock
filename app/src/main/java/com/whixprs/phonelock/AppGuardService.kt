@@ -43,8 +43,11 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
 
         /** Called by [LockActivity] after a successful fingerprint check. */
         fun markUnlocked(pkg: String) {
-            instance?.unlockedPackage = pkg
+            instance?.unlocked?.put(pkg, IN_USE)
         }
+
+        /** Marker in [unlocked] for an app that is unlocked and still on screen. */
+        private const val IN_USE = Long.MAX_VALUE
 
         fun isEnabled(ctx: Context): Boolean {
             val enabled = Settings.Secure.getString(
@@ -58,7 +61,11 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var masker: RecentsMasker
 
-    private var unlockedPackage: String? = null
+    /** Unlocked apps -> time the user left them ([IN_USE] while still open). */
+    private val unlocked = HashMap<String, Long>()
+    private var foregroundPackage: String? = null
+    private var relockMode = Prefs.RelockMode.BACKGROUND
+    private var relockMillis = 5 * 60_000L
     private var lastLockPackage: String? = null
     private var lastLockTime = 0L
 
@@ -77,7 +84,7 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             // Turning the screen off always re-locks everything.
-            unlockedPackage = null
+            unlocked.clear()
         }
     }
 
@@ -111,6 +118,8 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
 
     private fun reloadSettings() {
         lockedApps = Prefs.get(this, Prefs.KEY_LOCKED)
+        relockMode = Prefs.relockMode(this)
+        relockMillis = Prefs.relockMinutes(this) * 60_000L
         val pm = packageManager
         hiddenLabels = Prefs.get(this, Prefs.KEY_HIDDEN).mapNotNull { pkg ->
             runCatching { pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString() }
@@ -143,10 +152,29 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
         if (pkg == packageName || pkg == SYSTEM_UI || pkg == ANDROID || pkg in imePackages) return
         if (!isActivity(pkg, className)) return
 
-        // The user moved to a different app: the previously unlocked one locks again.
-        if (pkg != unlockedPackage) unlockedPackage = null
+        val now = SystemClock.elapsedRealtime()
+        val previous = foregroundPackage
+        foregroundPackage = pkg
 
-        if (pkg in lockedApps && pkg != unlockedPackage) showLock(pkg)
+        // The user left an unlocked app.
+        if (previous != null && previous != pkg && unlocked[previous] == IN_USE) {
+            if (relockMode == Prefs.RelockMode.BACKGROUND) unlocked.remove(previous)
+            else unlocked[previous] = now
+        }
+
+        if (pkg in lockedApps && !isStillUnlocked(pkg, now)) showLock(pkg)
+    }
+
+    private fun isStillUnlocked(pkg: String, now: Long): Boolean {
+        val leftAt = unlocked[pkg] ?: return false
+        val valid = when {
+            leftAt == IN_USE -> true
+            relockMode == Prefs.RelockMode.TIMEOUT -> now - leftAt < relockMillis
+            relockMode == Prefs.RelockMode.SCREEN_OFF -> true
+            else -> false
+        }
+        if (valid) unlocked[pkg] = IN_USE else unlocked.remove(pkg)
+        return valid
     }
 
     private fun isActivity(pkg: String, className: String?): Boolean {

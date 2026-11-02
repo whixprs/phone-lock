@@ -7,12 +7,14 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputEditText
 import java.util.concurrent.Executors
 
@@ -44,17 +46,23 @@ class MainActivity : AppCompatActivity() {
 
         val hint = findViewById<TextView>(R.id.tabHint)
         hint.setText(R.string.lock_hint)
+        val appsSection = findViewById<View>(R.id.appsSection)
+        val settingsSection = findViewById<View>(R.id.settingsSection)
         findViewById<BottomNavigationView>(R.id.bottomNav).setOnItemSelectedListener { item ->
+            val isSettings = item.itemId == R.id.nav_settings
+            appsSection.visibility = if (isSettings) View.GONE else View.VISIBLE
+            settingsSection.visibility = if (isSettings) View.VISIBLE else View.GONE
             if (item.itemId == R.id.nav_recents) {
                 currentKey = Prefs.KEY_HIDDEN
                 hint.setText(R.string.recents_hint)
-            } else {
+            } else if (item.itemId == R.id.nav_lock) {
                 currentKey = Prefs.KEY_LOCKED
                 hint.setText(R.string.lock_hint)
             }
             adapter.refresh()
             true
         }
+        setUpSettings()
 
         findViewById<Button>(R.id.enableButton).setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -106,6 +114,36 @@ class MainActivity : AppCompatActivity() {
                 finish()
             },
         )
+    }
+
+    private fun setUpSettings() {
+        val group = findViewById<RadioGroup>(R.id.relockGroup)
+        val timeoutRow = findViewById<View>(R.id.timeoutRow)
+        val label = findViewById<TextView>(R.id.timeoutLabel)
+        val slider = findViewById<Slider>(R.id.timeoutSlider)
+
+        val ids = mapOf(
+            Prefs.RelockMode.BACKGROUND to R.id.relockBackground,
+            Prefs.RelockMode.TIMEOUT to R.id.relockTimeout,
+            Prefs.RelockMode.SCREEN_OFF to R.id.relockScreenOff,
+        )
+        val mode = Prefs.relockMode(this)
+        group.check(ids.getValue(mode))
+        timeoutRow.visibility = if (mode == Prefs.RelockMode.TIMEOUT) View.VISIBLE else View.GONE
+        group.setOnCheckedChangeListener { _, checkedId ->
+            val newMode = ids.entries.first { it.value == checkedId }.key
+            Prefs.setRelockMode(this, newMode)
+            timeoutRow.visibility = if (newMode == Prefs.RelockMode.TIMEOUT) View.VISIBLE else View.GONE
+        }
+
+        val minutes = Prefs.relockMinutes(this).coerceIn(1, 60)
+        slider.value = minutes.toFloat()
+        label.text = getString(R.string.relock_minutes, minutes)
+        slider.setLabelFormatter { getString(R.string.relock_minutes, it.toInt()) }
+        slider.addOnChangeListener { _, value, fromUser ->
+            label.text = getString(R.string.relock_minutes, value.toInt())
+            if (fromUser) Prefs.setRelockMinutes(this, value.toInt())
+        }
     }
 
     private fun updateServiceCard() {

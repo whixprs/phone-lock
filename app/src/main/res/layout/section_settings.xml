@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/relock_title"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <RadioGroup
+            android:id="@+id/relockGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/relockBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/relock_background" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/relockTimeout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/relock_timeout" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/relockScreenOff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/relock_screen_off" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/timeoutRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/timeoutLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/timeoutSlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stepSize="1"
+                android:valueFrom="1"
+                android:valueTo="60" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/relock_footer"
+            android:textAppearance="?attr/textAppearanceBodySmall" />
+    </LinearLayout>
+</ScrollView>
