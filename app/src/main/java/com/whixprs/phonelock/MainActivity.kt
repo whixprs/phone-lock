@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputEditText
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(R.layout.activity_main)
         root = findViewById(R.id.root)
+        findViewById<MaterialToolbar>(R.id.toolbar).subtitle =
+            getString(R.string.version_label, BuildConfig.VERSION_NAME)
         unlocked = savedInstanceState?.getBoolean("unlocked") ?: false
 
         adapter = AppAdapter(

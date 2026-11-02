@@ -33,4 +33,5 @@ After switching an app on, close it and open it again once so the change applies
     <string name="relock_screen_off">Only when the screen turns off</string>
     <string name="relock_minutes">Lock after %1$d min</string>
     <string name="relock_footer">Turning the screen off always locks every app again, whichever option is chosen.</string>
+    <string name="version_label">Version %1$s</string>
 </resources>
