@@ -3,7 +3,7 @@
 A small Android app with two menus:
 
 - **App Lock** – pick apps that need your fingerprint every time they open. A black lock screen covers the app until you unlock it (falls back to your device PIN on Android 11+ if the fingerprint fails).
-- **Hide in Recents** – pick apps whose card on the recent-apps screen gets covered with a black box instead of showing the last thing on screen.
+- **Hide in Recents** – pick apps that show a solid black card on the recent-apps screen, like the camera app (needs root + LSPosed, see below).
 
 The Phone Lock settings screen is itself protected by your fingerprint once any app is selected, so nobody can just switch the locks off.
 
@@ -22,16 +22,16 @@ A new release is published automatically every time `main` is updated.
    - Android 13+: if the switch is greyed out ("Restricted setting"), go to *Settings › Apps › Phone Lock*, tap **⋮ › Allow restricted settings**, then try again.
 4. Pick your apps in each tab.
 
-## Root mode (LSPosed): truly black recents cards
+## Hide in Recents (root + LSPosed)
 
-On a rooted phone with LSPosed, Phone Lock also works as an LSPosed module. It makes the apps in **Hide in Recents** show a completely black card, the same way the camera app does, with no box drawn on top.
+Android only lets an app black out its own recents card (that's what the camera does), so this part is an LSPosed module built into the same APK. It hooks Android's window manager so every window of a hidden app is treated as secure, which gives it the same black card.
 
 1. Install the APK, open **LSPosed › Modules**, and turn on **Phone Lock**.
-2. In the module's scope, tick **Phone Lock** itself plus every app you want hidden.
-3. Reboot (or force-stop Phone Lock and those apps).
-4. In Phone Lock's **Hide in Recents** tab, switch the same apps on. The tab says "Root mode is on" when the module is working.
+2. In its scope, tick **System Framework** and **Phone Lock** (these are pre-selected as recommended).
+3. Reboot.
+4. In Phone Lock's **Hide in Recents** tab, switch apps on. The tab says "Root module active" when it's working. Close and reopen an app once after switching it on.
 
-This sets Android's secure-window flag on those apps, so screenshots and screen recordings of them come out black too. While root mode is on, the accessibility boxes are turned off.
+Screenshots and screen recordings of hidden apps come out black too. Without root, nothing is drawn over recents – the tab just explains that the module is needed.
 
 ## Build
 
@@ -44,10 +44,10 @@ Needs JDK 17+ and the Android SDK (platform 35). Every build is signed with the 
 
 ## How it works and its limits
 
-Android has no public API for one app to lock another or to change another app's recents thumbnail, so Phone Lock uses an accessibility service:
+Android has no public API for one app to lock another, so the lock uses an accessibility service:
 
 - **Lock:** when a locked app's activity comes to the front, the lock screen is launched on top. The app re-locks as soon as you switch to a different app or turn the screen off. There can be a split-second flash of the app before the lock screen appears.
-- **Recents:** while the launcher's recents screen is open, the service finds cards labelled with a hidden app's name and draws non-touchable black boxes over them (you can still tap and swipe the cards). This depends on the launcher labelling its cards, which Pixel/stock Android, Samsung One UI and most others do. The live animation while you swipe up from an app, and fast card scrolling, may briefly show the real thumbnail before the box catches up.
+- **Recents:** handled by the LSPosed module, not the accessibility service (see above).
 - Many phones (Samsung, Xiaomi, OnePlus, Pixel with Private Space) also have a built-in "hide content in recents" option you can combine with this.
 
-The service only reads package/window names and recents card labels. Nothing is saved or sent anywhere, and the app has no internet permission.
+The service only checks which app is in front. Nothing is saved or sent anywhere, and the app has no internet permission.

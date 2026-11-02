@@ -1,18 +1,24 @@
 <resources>
     <string name="app_name">Phone Lock</string>
     <string name="service_label">Phone Lock guard</string>
-    <string name="service_description">Detects when a protected app is opened so Phone Lock can ask for your fingerprint, and covers selected apps with black in the recent apps screen. Phone Lock does not collect, store or send any screen content.</string>
+    <string name="service_description">Detects when a protected app is opened so Phone Lock can ask for your fingerprint. It only checks which app is in front; nothing is collected, stored or sent.</string>
     <string name="tab_lock">App Lock</string>
     <string name="tab_recents">Hide in Recents</string>
     <string name="search_hint">Search apps</string>
     <string name="service_off_title">Guard service is off</string>
-    <string name="service_off_body">Phone Lock needs its accessibility service to detect when apps open and to black out recents. Tap Enable, then turn on \"Phone Lock guard\".\n\nIf the switch is greyed out (Android 13+): open Settings > Apps > Phone Lock, tap the ⋮ menu and choose \"Allow restricted settings\", then try again.</string>
+    <string name="service_off_body">Phone Lock needs its accessibility service to detect when locked apps open. Tap Enable, then turn on \"Phone Lock guard\".
+
+If the switch is greyed out (Android 13+): open Settings › Apps › Phone Lock, tap the ⋮ menu and choose \"Allow restricted settings\", then try again.</string>
     <string name="service_on_title">Guard service is running</string>
-    <string name="service_on_body">Locks and recents masking are active.</string>
+    <string name="service_on_body">App locks are active.</string>
     <string name="enable">Enable</string>
     <string name="lock_hint">Apps switched on here ask for your fingerprint every time they are opened.</string>
-    <string name="recents_hint">Apps switched on here are covered with black on the recent apps screen instead of showing their last screen.\n\nRooted with LSPosed? Enable the Phone Lock module in LSPosed to make the cards fully black, like the camera app.</string>
-    <string name="recents_hint_root">Root mode is on: apps switched on here show a fully black card in recents, like the camera app. Screenshots and screen recordings of these apps will be black too.\n\nAlso tick each app in LSPosed › Modules › Phone Lock, then force-stop it once so the change applies.</string>
+    <string name="recents_hint">⚠ Root module not active – these apps will still show their last screen.
+
+To make them black in recents like the camera app: open LSPosed › Modules › Phone Lock, turn it on, tick \"System Framework\" and \"Phone Lock\" in its list, then reboot.</string>
+    <string name="recents_hint_root">✓ Root module active. Apps switched on here show a solid black card in recents, like the camera app. Screenshots and screen recordings of them are black too.
+
+After switching an app on, close it and open it again once so the change applies.</string>
     <string name="xposed_description">Makes the apps you pick in Phone Lock show a black card in recent apps.</string>
     <string name="unlock_title">Unlock %1$s</string>
     <string name="unlock_subtitle">Use your fingerprint to continue</string>

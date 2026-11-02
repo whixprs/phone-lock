@@ -1,6 +1,7 @@
 package com.whixprs.phonelock.xposed
 
 import android.app.Activity
+import android.os.SystemClock
 import android.view.Window
 import android.view.WindowManager
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -11,12 +12,15 @@ import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
- * LSPosed module entry. Runs inside each app ticked in the module's LSPosed scope.
+ * LSPosed module entry.
  *
- * For apps switched on in Phone Lock's "Hide in Recents" list it forces
- * FLAG_SECURE on every window – the same thing the camera and banking apps do
- * themselves – so Android shows a black card in recents instead of the last
- * screen.
+ * Apps in Phone Lock's "Hide in Recents" list are treated as secure windows –
+ * the same thing the camera and banking apps do themselves – so Android shows
+ * a black card in recents instead of the last screen.
+ *
+ * Main path: the System Framework hook ([hookSystemFramework]). Fallback: if
+ * individual apps are ticked in the LSPosed scope, FLAG_SECURE is also forced
+ * from inside those apps.
  */
 class XposedEntry : IXposedHookLoadPackage {
 
@@ -43,7 +47,10 @@ class XposedEntry : IXposedHookLoadPackage {
             )
             return
         }
-        if (lpparam.packageName == "android") return
+        if (lpparam.packageName == "android") {
+            hookSystemFramework(lpparam.classLoader)
+            return
+        }
 
         packageName = lpparam.packageName
         prefs = runCatching { XSharedPreferences(MODULE, PREFS_FILE) }.getOrNull()
@@ -74,6 +81,55 @@ class XposedEntry : IXposedHookLoadPackage {
             },
         )
     }
+
+    // ------------------------------------------------------------ System Framework
+
+    private var systemHidden: Set<String> = emptySet()
+    private var systemLastCheck = 0L
+
+    /**
+     * Runs in system_server ("System Framework" in the LSPosed scope). Android
+     * decides whether a window is "secure" – the thing that makes the camera's
+     * recents card black – in WindowState.isSecureLocked(). Returning true for
+     * every window of a hidden app gives it the same black card, without having
+     * to tick each app in LSPosed.
+     */
+    private fun hookSystemFramework(classLoader: ClassLoader) {
+        val p = runCatching { XSharedPreferences(MODULE, PREFS_FILE) }.getOrNull() ?: return
+        try {
+            XposedHelpers.findAndHookMethod(
+                "com.android.server.wm.WindowState", classLoader, "isSecureLocked",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        if (param.result == true) return
+                        val attrs = XposedHelpers.getObjectField(param.thisObject, "mAttrs")
+                            as? WindowManager.LayoutParams ?: return
+                        if (attrs.packageName in systemHiddenApps(p)) param.result = true
+                    }
+                },
+            )
+            XposedBridge.log("PhoneLock: hooked WindowState.isSecureLocked")
+        } catch (t: Throwable) {
+            XposedBridge.log("PhoneLock: could not hook System Framework: $t")
+        }
+    }
+
+    /** The hidden list, re-read at most once a second (this is called very often). */
+    private fun systemHiddenApps(p: XSharedPreferences): Set<String> {
+        val now = SystemClock.uptimeMillis()
+        if (now - systemLastCheck > 1000) {
+            systemLastCheck = now
+            try {
+                if (p.hasFileChanged()) p.reload()
+                systemHidden = HashSet(p.getStringSet(KEY_HIDDEN, emptySet()) ?: emptySet())
+            } catch (t: Throwable) {
+                // Keep the last known list.
+            }
+        }
+        return systemHidden
+    }
+
+    // ------------------------------------------------------------ Per-app fallback
 
     /**
      * True when this app is in Phone Lock's list. If Phone Lock's settings can't

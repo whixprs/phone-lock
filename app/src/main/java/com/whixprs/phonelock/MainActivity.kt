@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             settingsSection.visibility = if (isSettings) View.VISIBLE else View.GONE
             if (item.itemId == R.id.nav_recents) {
                 currentKey = Prefs.KEY_HIDDEN
-                hint.setText(if (ModuleStatus.isActive(this)) R.string.recents_hint_root else R.string.recents_hint)
+                updateRecentsHint()
             } else if (item.itemId == R.id.nav_lock) {
                 currentKey = Prefs.KEY_LOCKED
                 hint.setText(R.string.lock_hint)
@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateServiceCard()
+        if (currentKey == Prefs.KEY_HIDDEN) updateRecentsHint()
         ensureUnlocked()
     }
 
@@ -145,6 +146,13 @@ class MainActivity : AppCompatActivity() {
             label.text = getString(R.string.relock_minutes, value.toInt())
             if (fromUser) Prefs.setRelockMinutes(this, value.toInt())
         }
+    }
+
+    private fun updateRecentsHint() {
+        Prefs.syncXposed(this)
+        findViewById<TextView>(R.id.tabHint).setText(
+            if (ModuleStatus.isActive(this)) R.string.recents_hint_root else R.string.recents_hint
+        )
     }
 
     private fun updateServiceCard() {
