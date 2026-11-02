@@ -7,9 +7,16 @@ A small Android app with two menus:
 
 The Phone Lock settings screen is itself protected by your fingerprint once any app is selected, so nobody can just switch the locks off.
 
+## Download
+
+- **APK:** [PhoneLock.apk](https://github.com/whixprs/phone-lock/releases/latest/download/PhoneLock.apk) (latest build)
+- **Source code:** [zip](https://github.com/whixprs/phone-lock/archive/refs/heads/main.zip) – or pick any version on the [Releases page](https://github.com/whixprs/phone-lock/releases), which has the APK plus source zip/tar.gz for every build.
+
+A new release is published automatically every time `main` is updated.
+
 ## Install
 
-1. Download the APK (from the **Actions** tab › latest *Build APK* run › `PhoneLock-apk`, or build it yourself below).
+1. Download the APK (link above, or build it yourself below).
 2. Open it on the phone and allow installing from that source.
 3. Open **Phone Lock** and tap **Enable**, then turn on **Phone Lock guard** in Accessibility settings.
    - Android 13+: if the switch is greyed out ("Restricted setting"), go to *Settings › Apps › Phone Lock*, tap **⋮ › Allow restricted settings**, then try again.

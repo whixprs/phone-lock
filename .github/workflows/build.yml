@@ -4,19 +4,52 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - uses: android-actions/setup-android@v3
+
       - name: Build
-        run: ./gradlew --no-daemon assembleRelease
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk PhoneLock.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: PhoneLock-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: PhoneLock.apk
+
+      # Every push to main publishes a GitHub Release with the APK attached.
+      # GitHub adds "Source code (zip)" and "Source code (tar.gz)" to each release.
+      - name: Read version
+        if: github.ref == 'refs/heads/main'
+        id: version
+        run: echo "name=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.name }}-build${{ github.run_number }}
+          name: Phone Lock ${{ steps.version.outputs.name }} (build ${{ github.run_number }})
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: PhoneLock.apk
+          body: |
+            **Download:** `PhoneLock.apk` below – open it on your phone to install. It installs over earlier builds.
+
+            Source code is attached below as zip and tar.gz.
+
+            Built from ${{ github.sha }}.
