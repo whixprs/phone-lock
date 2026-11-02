@@ -22,6 +22,17 @@ A new release is published automatically every time `main` is updated.
    - Android 13+: if the switch is greyed out ("Restricted setting"), go to *Settings › Apps › Phone Lock*, tap **⋮ › Allow restricted settings**, then try again.
 4. Pick your apps in each tab.
 
+## Root mode (LSPosed): truly black recents cards
+
+On a rooted phone with LSPosed, Phone Lock also works as an LSPosed module. It makes the apps in **Hide in Recents** show a completely black card, the same way the camera app does, with no box drawn on top.
+
+1. Install the APK, open **LSPosed › Modules**, and turn on **Phone Lock**.
+2. In the module's scope, tick **Phone Lock** itself plus every app you want hidden.
+3. Reboot (or force-stop Phone Lock and those apps).
+4. In Phone Lock's **Hide in Recents** tab, switch the same apps on. The tab says "Root mode is on" when the module is working.
+
+This sets Android's secure-window flag on those apps, so screenshots and screen recordings of them come out black too. While root mode is on, the accessibility boxes are turned off.
+
 ## Build
 
 ```

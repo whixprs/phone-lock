@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "PhoneLock"
-include(":app")
+include(":app", ":xposed-stubs")

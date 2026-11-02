@@ -70,6 +70,8 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
     private var lastLockTime = 0L
 
     private var lockedApps: Set<String> = emptySet()
+    /** Root mode makes the real recents cards black, so no boxes are drawn on top. */
+    private var rootMode = false
     private var hiddenLabels: Map<String, String> = emptyMap() // label -> package
     private var homePackages: Set<String> = emptySet()
     private var imePackages: Set<String> = emptySet()
@@ -118,6 +120,7 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
 
     private fun reloadSettings() {
         lockedApps = Prefs.get(this, Prefs.KEY_LOCKED)
+        rootMode = ModuleStatus.isActive(this)
         relockMode = Prefs.relockMode(this)
         relockMillis = Prefs.relockMinutes(this) * 60_000L
         val pm = packageManager
@@ -218,7 +221,7 @@ class AppGuardService : AccessibilityService(), SharedPreferences.OnSharedPrefer
     }
 
     private fun updateRecentsMask() {
-        if (hiddenLabels.isEmpty()) {
+        if (hiddenLabels.isEmpty() || rootMode) {
             setMasks(emptyList())
             return
         }

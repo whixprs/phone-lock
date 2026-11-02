@@ -29,6 +29,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PhoneLock">
 
+        <!-- LSPosed module: makes selected apps show black in recents (root only). -->
+        <meta-data android:name="xposedmodule" android:value="true" />
+        <meta-data android:name="xposeddescription" android:value="@string/xposed_description" />
+        <meta-data android:name="xposedminversion" android:value="93" />
+        <meta-data android:name="xposedsharedprefs" android:value="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

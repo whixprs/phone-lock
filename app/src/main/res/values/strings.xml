@@ -11,7 +11,9 @@
     <string name="service_on_body">Locks and recents masking are active.</string>
     <string name="enable">Enable</string>
     <string name="lock_hint">Apps switched on here ask for your fingerprint every time they are opened.</string>
-    <string name="recents_hint">Apps switched on here are covered with black on the recent apps screen instead of showing their last screen.</string>
+    <string name="recents_hint">Apps switched on here are covered with black on the recent apps screen instead of showing their last screen.\n\nRooted with LSPosed? Enable the Phone Lock module in LSPosed to make the cards fully black, like the camera app.</string>
+    <string name="recents_hint_root">Root mode is on: apps switched on here show a fully black card in recents, like the camera app. Screenshots and screen recordings of these apps will be black too.\n\nAlso tick each app in LSPosed › Modules › Phone Lock, then force-stop it once so the change applies.</string>
+    <string name="xposed_description">Makes the apps you pick in Phone Lock show a black card in recent apps.</string>
     <string name="unlock_title">Unlock %1$s</string>
     <string name="unlock_subtitle">Use your fingerprint to continue</string>
     <string name="unlock_settings_title">Unlock Phone Lock</string>
